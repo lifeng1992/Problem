@@ -1,4 +1,9 @@
 为另一个进程创建的窗口建立子类，改变这个窗口的行为特性。
-此项目包含两个子项目:
-SubclassDll
-SubclassTest
+
+项目起源:我现在使用 Github for Windows 这个软件来做版本控制，就当前的体验来说，大体上还是比较愉快的，除了一点之外。当点击窗口右上角的关闭按钮的时候，我想要的是把它最小化到托盘，令人沮丧的现实，程序直接就结束了运行。虽然这也是相当合理的，但为了适应我的使用习惯，决定改造一翻。
+
+项目设计:整个项目由四个部分组成
+	目标进程	:即 Github for Windows 这个程序
+	SubDll.dll	:通过 SetWindowsHookEx 注入到目标进程的 DLL 文件
+	SubStart.exe:包含一个隐藏窗体和一个托盘图标，点击托盘图标即恢复目标进程窗口界面的显示
+	SubEnd.exe	:控制台程序，仅负责向 SubStart.exe Post一条消息以结束 SubStart.exe
