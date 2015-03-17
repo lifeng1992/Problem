@@ -112,7 +112,7 @@ LRESULT CALLBACK HookGetMsgProc(int nCode, WPARAM wParam, LPARAM lParam){
 LRESULT CALLBACK SubclassWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam){
 	switch(Msg){
 		case WM_CLOSE:{
-			MessageBoxA(NULL, "WM_CLOSE Be Hooked", "SubStart", MB_OK);
+			ShowWindow(hWnd, SW_HIDE);
 			return 0;
 		}break;
 
