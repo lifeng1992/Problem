@@ -1,3 +1,4 @@
+#include "resource.h"
 #include <Windows.h>
 #include <WindowsX.h>
 #include <stdio.h>
@@ -76,10 +77,10 @@ void CreateWindowsClass(WNDCLASSEX *pwinclass, HINSTANCE hInstance){
 	pwinclass->cbClsExtra		= 0;
 	pwinclass->cbWndExtra		= 0;
 	pwinclass->hInstance		= hInstance;
-	pwinclass->hIcon			= LoadIcon(NULL, IDI_APPLICATION);
+	pwinclass->hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GITHUB));
 	pwinclass->hCursor			= LoadCursor(NULL, IDC_ARROW);
 	pwinclass->hbrBackground	= (HBRUSH)GetStockObject(BLACK_BRUSH);
 	pwinclass->lpszMenuName		= NULL;
 	pwinclass->lpszClassName	= APP_CLASS_NAME;
-	pwinclass->hIconSm			= LoadIcon(NULL, IDI_APPLICATION);
+	pwinclass->hIconSm			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GITHUB));
 }

@@ -1,0 +1,4 @@
+#include "resource.h"
+
+// ICON
+IDI_GITHUB		ICON    DISCARDABLE		"GITHUB.ICO"
