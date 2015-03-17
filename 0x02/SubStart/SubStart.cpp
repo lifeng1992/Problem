@@ -32,7 +32,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hprevinstance, LPSTR lpCmdline
 	}
 	// 创建窗口
 	hwnd = CreateWindowExW(NULL, APP_CLASS_NAME, TEXT("SubStart"),
-		WS_POPUP | WS_CAPTION | WS_VISIBLE,
+		WS_POPUP | WS_CAPTION,
 		200, 100, 480, 360, NULL, NULL, hInstance, NULL);
 	if(!hwnd){
 		return 0;
