@@ -7,6 +7,10 @@
 
 #define APP_CLASS_NAME	TEXT("ClassName-SubStart")
 
+typedef BOOL (*PINSTALL)(void);
+typedef BOOL (*PUNINSTALL)(void);
+typedef BOOL (*PRESTORE)(void);
+
 // 创建一个Windows窗口类
 void CreateWindowsClass(WNDCLASSEX *pwinclass, HINSTANCE hInstance);
 
@@ -48,9 +52,36 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam){
 	static NOTIFYICONDATA nid;
 
 	static UINT WM_USER_CLOSE = RegisterWindowMessage(TEXT("WM_USER_CLOSE"));
+	static UINT WM_USER_SUB_EXIT = RegisterWindowMessage(TEXT("WM_USER_SUB_EXIT"));
+	
+	static	HINSTANCE	hModule		= NULL;
+	static	PINSTALL	pInstall	= NULL;
+	static	PUNINSTALL	pUnInstall	= NULL;
+	static  PRESTORE	pRestore	= NULL;
 
 	switch(Msg){
 		case WM_CREATE:{
+			hModule = LoadLibraryA("SubDll.dll");
+			if(hModule == NULL){
+				MessageBoxA(NULL, "SubDll.dll文件不存在", "DLL加载失败", MB_OK);
+				exit(0);
+			}
+
+			pInstall	= (PINSTALL)GetProcAddress(hModule, "InstallHook");
+			pUnInstall	= (PUNINSTALL)GetProcAddress(hModule, "UnInstallHook");
+			pRestore	= (PRESTORE)GetProcAddress(hModule, "RestoreWndProc");
+			if(pInstall == NULL || pUnInstall == NULL || pRestore == NULL){
+				MessageBoxA(NULL, "DLL函数加载失败", "加载失败", MB_OK);
+				FreeLibrary(hModule);
+				exit(0);
+			}
+
+			BOOL res = pInstall();
+			if(res == FALSE){
+				MessageBoxA(NULL, "Hook Target Process Error", 
+					"SubStart Error", MB_OK);
+			}
+
 			InitTray(hWnd, &nid);
 			Shell_NotifyIconW(NIM_ADD, &nid);
 			return 0;
@@ -59,11 +90,6 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam){
 		case WM_PAINT:{
 			hdc = BeginPaint(hWnd, &ps);
 			EndPaint(hWnd, &ps);
-			return 0;
-		}break;
-
-		case WM_CLOSE:{
-			PostQuitMessage(0);
 			return 0;
 		}break;
 
@@ -76,8 +102,18 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam){
 
 		default:{
 			if(Msg == WM_USER_CLOSE){
-				PostQuitMessage(0);
+				pRestore();
 				return 0;
+			}else if(Msg == WM_USER_SUB_EXIT){
+				BOOL ret = pUnInstall();
+				if(ret == FALSE){
+					MessageBoxA(NULL, "UnHook Target Process Failure",
+						"SubStart Error", MB_OK);
+				}
+				FreeLibrary(hModule);
+				PostQuitMessage(0);
+			}else{
+				;
 			}
 		}break;
 	}
