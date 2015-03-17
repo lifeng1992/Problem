@@ -5,7 +5,8 @@
 
 #define WM_USER_TRAY	(WM_USER + 100)
 
-#define APP_CLASS_NAME	TEXT("ClassName-SubStart")
+#define APP_CLASS_NAME			TEXT("ClassName-SubStart")
+#define APP_TARGET_CLASS_NAME	TEXT("ClassName-Spyder")
 
 typedef BOOL (*PINSTALL)(void);
 typedef BOOL (*PUNINSTALL)(void);
@@ -59,6 +60,8 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam){
 	static	PUNINSTALL	pUnInstall	= NULL;
 	static  PRESTORE	pRestore	= NULL;
 
+	static	HWND		hWnd_Target		= NULL;
+
 	switch(Msg){
 		case WM_CREATE:{
 			hModule = LoadLibraryA("SubDll.dll");
@@ -82,6 +85,8 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam){
 					"SubStart Error", MB_OK);
 			}
 
+			hWnd_Target = FindWindow(APP_TARGET_CLASS_NAME, NULL);
+
 			InitTray(hWnd, &nid);
 			Shell_NotifyIconW(NIM_ADD, &nid);
 			return 0;
@@ -95,7 +100,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam){
 
 		case WM_USER_TRAY:{
 			if(lParam == WM_RBUTTONUP || lParam == WM_LBUTTONUP){
-				MessageBoxA(NULL, "Message from tray.", "SubStart", MB_OK);
+				ShowWindow(hWnd_Target, SW_RESTORE);
 			}
 			return 0;
 		}break;
@@ -110,6 +115,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam){
 					MessageBoxA(NULL, "UnHook Target Process Failure",
 						"SubStart Error", MB_OK);
 				}
+				ShowWindow(hWnd_Target, SW_RESTORE);
 				FreeLibrary(hModule);
 				PostQuitMessage(0);
 			}else{
