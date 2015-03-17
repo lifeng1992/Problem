@@ -40,6 +40,8 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam){
 	PAINTSTRUCT ps;
 	HDC			hdc;
 
+	static UINT WM_USER_CLOSE = RegisterWindowMessage(TEXT("WM_USER_CLOSE"));
+
 	switch(Msg){
 		case WM_CREATE:{
 			return 0;
@@ -49,14 +51,19 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam){
 			hdc = BeginPaint(hWnd, &ps);
 			EndPaint(hWnd, &ps);
 			return 0;
-			break;
-		}
+		}break;
 
 		case WM_CLOSE:{
 			PostQuitMessage(0);
+			return 0;
 		}break;
 
-		default:break;
+		default:{
+			if(Msg == WM_USER_CLOSE){
+				PostQuitMessage(0);
+				return 0;
+			}
+		}break;
 	}
 
 	return DefWindowProc(hWnd, Msg, wParam, lParam);			  
