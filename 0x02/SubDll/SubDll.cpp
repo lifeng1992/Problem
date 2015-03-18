@@ -37,15 +37,9 @@ BOOL APIENTRY DllMain(HINSTANCE hInstance, DWORD  Reason, LPVOID Reserved){
 	return TRUE;
 }
 
-BOOL InstallHook(){
-	hWnd		= FindWindowW(APP_TARGET_CLASS_NAME, NULL);
-	hWnd_App	= FindWindowW(APP_CLASS_NAME, NULL);
-	if(hWnd == NULL){
-		MessageBox(NULL, TEXT("Target Application Don't Start"), 
-			APP_TARGET_CLASS_NAME, 
-			MB_OK);
-		exit(0);
-	}
+BOOL InstallHook(HWND hWnd_Application, HWND hWnd_Target){
+	hWnd_App	= hWnd_Application;
+	hWnd		= hWnd_Target;
 
 	hhk	= SetWindowsHookExW(WH_GETMESSAGE, (HOOKPROC)HookGetMsgProc, hInst, 
 		GetWindowThreadProcessId(hWnd, NULL));

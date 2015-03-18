@@ -8,7 +8,7 @@
 #define APP_CLASS_NAME			TEXT("ClassName-SubStart")
 #define APP_TARGET_CLASS_NAME	TEXT("ClassName-Spyder")
 
-typedef BOOL (*PINSTALL)(void);
+typedef BOOL (*PINSTALL)(HWND, HWND);
 typedef BOOL (*PUNINSTALL)(void);
 typedef BOOL (*PRESTORE)(void);
 
@@ -79,13 +79,22 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam){
 				exit(0);
 			}
 
-			BOOL res = pInstall();
+			hWnd_Target = FindWindow(APP_TARGET_CLASS_NAME, NULL);
+			if(hWnd_Target == NULL){
+				MessageBox(NULL, TEXT("Target Application Don't Start"), 
+					APP_TARGET_CLASS_NAME, 
+					MB_OK);
+				FreeLibrary(hModule);
+				exit(0);
+			}
+
+			BOOL res = pInstall(hWnd, hWnd_Target);
 			if(res == FALSE){
 				MessageBoxA(NULL, "Hook Target Process Error", 
 					"SubStart Error", MB_OK);
+				FreeLibrary(hModule);
+				exit(0);
 			}
-
-			hWnd_Target = FindWindow(APP_TARGET_CLASS_NAME, NULL);
 
 			InitTray(hWnd, &nid);
 			Shell_NotifyIconW(NIM_ADD, &nid);

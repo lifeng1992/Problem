@@ -1,3 +1,8 @@
 ;SubDll.dll
 
 LIBRARY				SubDll
+
+EXPORTS
+InstallHook			@1
+UnInstallHook		@2
+RestoreWndProc		@3
